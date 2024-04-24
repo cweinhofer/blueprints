@@ -1,0 +1,83 @@
+blueprint:
+  name: LoraTap SS6200ZB (TS0042) Multi-Button
+  description: Automate actions for the LoraTap SS6200ZB (TS0042) Multi-Button over Zigbee
+  domain: automation
+  input:
+    loratap_multibutton:
+      name: Button Name
+      selector:
+        device:
+          integration: zha
+          manufacturer: _TZ3000_fkvaniuu
+          model: TS0042
+          multiple: false
+    button_one_short_press:
+      name: Single Press
+      description: Action to run on button 1 (lower-left) single press
+      default: []
+      selector:
+        action: {}
+    button_one_double_press:
+      name: Double Press
+      description: Action to run on button 1 (lower-left) double press
+      default: []
+      selector:
+        action: {}
+    button_one_long_press:
+      name: Long Press
+      description: Action to run on button 1 (lower-left) long press
+      default: []
+      selector:
+        action: {}
+    button_two_short_press:
+      name: Single Press
+      description: Action to run on button 2 (lower-right) single press
+      default: []
+      selector:
+        action: {}
+    button_two_double_press:
+      name: Double Press
+      description: Action to run on button 2 (lower-right) double press
+      default: []
+      selector:
+        action: {}
+    button_two_long_press:
+      name: Long Press
+      description: Action to run on button 2 (lower-right) long press
+      default: []
+      selector:
+        action: {}
+  source_url: https://github.com/cweinhofer/blueprints/blob/main/loratap_ss6200zb_zha.yaml
+mode: restart
+max_exceeded: silent
+trigger:
+- platform: event
+  event_type: zha_event
+  event_data:
+    device_id: !input loratap_multibutton
+action:
+- variables:
+    command: '{{ trigger.event.data.command }}'
+    endpoint_id: '{{ trigger.event.data.endpoint_id }}'
+- choose:
+  - conditions: '{{ command == ''remote_button_short_press'' }}'
+    sequence:
+    - choose:
+      - conditions: '{{ endpoint_id == 1 }}'
+        sequence: !input button_one_short_press
+      - conditions: '{{ endpoint_id == 2 }}'
+        sequence: !input button_two_short_press
+  - conditions: '{{ command == ''remote_button_double_press'' }}'
+    sequence:
+    - choose:
+      - conditions: '{{ endpoint_id == 1 }}'
+        sequence: !input button_one_double_press
+      - conditions: '{{ endpoint_id == 2 }}'
+        sequence: !input button_two_double_press
+  - conditions: '{{ command == ''remote_button_long_press'' }}'
+    sequence:
+    - choose:
+      - conditions: '{{ endpoint_id == 1 }}'
+        sequence: !input button_one_long_press
+      - conditions: '{{ endpoint_id == 2 }}'
+        sequence: !input button_two_long_press
